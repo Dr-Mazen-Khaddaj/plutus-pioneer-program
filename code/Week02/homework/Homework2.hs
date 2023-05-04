@@ -9,9 +9,9 @@ module Homework2 where
 
 import qualified Plutus.V2.Ledger.Api as PlutusV2
 import           PlutusTx             (unstableMakeIsData, compile)
-import           PlutusTx.Prelude     (Bool, BuiltinData)
-import           Prelude              ((/=))
-import           Utilities            (wrapValidator)
+import           PlutusTx.Prelude     (Bool (..), BuiltinData, (++))
+import           Prelude              ((/=), IO, FilePath)
+import           Utilities            (wrapValidator, writeDataToFile)
 
 ---------------------------------------------------------------------------------------------------
 ----------------------------------- ON-CHAIN / VALIDATOR ------------------------------------------
@@ -33,3 +33,17 @@ wrappedVal = wrapValidator mkValidator
 
 validator :: PlutusV2.Validator
 validator = PlutusV2.mkValidatorScript $$(PlutusTx.compile [|| wrappedVal ||])
+
+---------------------------------------------------------------------------------------------------
+------------------------------------- HELPER FUNCTIONS --------------------------------------------
+
+writeMyRedeemer :: FilePath -> IO ()
+writeMyRedeemer filePath = do
+    let wrappedDoubleTrue    =  MyRedeemer  True   True
+    let wrappedDoubleFalse   =  MyRedeemer  False  False
+    let wrappedTrueFalse     =  MyRedeemer  True   False
+    let wrappedFalseTrue     =  MyRedeemer  False  True
+    writeDataToFile ( filePath ++ "wrappedDoubleTrue.json"  )  wrappedDoubleTrue
+    writeDataToFile ( filePath ++ "wrappedDoubleFalse.json" )  wrappedDoubleFalse
+    writeDataToFile ( filePath ++ "wrappedTrueFalse.json"   )  wrappedTrueFalse
+    writeDataToFile ( filePath ++ "wrappedFalseTrue.json"   )  wrappedFalseTrue
